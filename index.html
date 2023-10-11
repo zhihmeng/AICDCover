@@ -1,43 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Demo</title>
+    <title>Text-to-Image API示例</title>
 </head>
 <body>
-    <h1>API Demo</h1>
-    <form id="apiForm">
-        <label for="text1">Text 1:</label>
-        <input type="text" id="text1" name="text1"><br>
-        <label for="text2">Text 2:</label>
-        <input type="text" id="text2" name="text2"><br>
-        <label for="text3">Text 3:</label>
-        <input type="text" id="text3" name="text3"><br>
-        <button type="submit">Generate Images</button>
-    </form>
-    
-    <div id="imageContainer"></div>
+    <h1>Text-to-Image API示例</h1>
+
+    <label for="prompt1">Prompt 1：</label>
+    <input type="text" id="prompt1" placeholder="輸入提示1"><br><br>
+
+    <label for="prompt2">Prompt 2：</label>
+    <input type="text" id="prompt2" placeholder="輸入提示2"><br><br>
+
+    <label for="prompt3">Prompt 3：</label>
+    <input type="text" id="prompt3" placeholder="輸入提示3"><br><br>
+
+    <button onclick="generateImages()">生成圖片</button><br><br>
+
+    <div id="imageContainer">
+        <!-- 這裡將顯示生成的圖片 -->
+    </div>
 
     <script>
-        document.getElementById("apiForm").addEventListener("submit", function (e) {
-            e.preventDefault();
-            
-            const text1 = document.getElementById("text1").value;
-            const text2 = document.getElementById("text2").value;
-            const text3 = document.getElementById("text3").value;
-            
-            fetch("https://zhihmeng.ddns.net/sdapi/v1/txt2img", {
-                method: "GET",
-                referrerPolicy: "unsafe-url",
-                mode: "no-cors",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(
-                    {
+        async function generateImages() {
+            const prompt1 = document.getElementById('prompt1').value;
+            const prompt2 = document.getElementById('prompt2').value;
+            const prompt3 = document.getElementById('prompt3').value;
+            const imageContainer = document.getElementById('imageContainer');
+
+            // 請將下面的URL替換為你的API端點
+            const apiUrl = 'https://zhihmeng.ddns.net/sdapi/v1/txt2img';
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
                         "denoising_strength": 0,
-                        "prompt": text1 + "," + text2 + "," + text3 + ",a cd cover",
+                        "prompt": prompt1 + "," + prompt2 + "," + prompt3 + ",a image of cd cover",
                         "negative_prompt": "easy negative",
                         "seed": -1,
                         "batch_size": 2,
@@ -61,24 +63,21 @@
                             1
                         ],
                         "sampler_index": "Euler"
-                    }
-                )
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data);
-                // 创建并展示图像
-                const imageContainer = document.getElementById("imageContainer");
-                imageContainer.innerHTML = "";
-                
-                for (let i = 0; i < 3; i++) {
-                    const img = document.createElement("img");
-                    img.src = `data:image/png;base64,${data[`image${i+1}`]}`;
-                    imageContainer.appendChild(img);
-                }
-            })
-            .catch(error => console.error(error));
-        });
+                    })
+                });
+
+                const data = await response.json();
+
+                // 顯示生成的Base64圖片
+                imageContainer.innerHTML = `
+                    <img src="data:image/png;base64, ${data.image1}" alt="Image 1">
+                    <img src="data:image/png;base64, ${data.image2}" alt="Image 2">
+                    <img src="data:image/png;base64, ${data.image3}" alt="Image 3">
+                `;
+            } catch (error) {
+                console.error('發生錯誤:', error);
+            }
+        }
     </script>
 </body>
 </html>
