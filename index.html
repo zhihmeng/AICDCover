@@ -20,7 +20,6 @@
     <div id="imageContainer"></div>
 
     <script>
-        alert(document.getElementById("apiForm"));
         document.getElementById("apiForm").addEventListener("submit", function (e) {
             e.preventDefault();
             
@@ -67,6 +66,7 @@
             })
             .then(response => response.json())
             .then(data => {
+                alert(data);
                 // 创建并展示图像
                 const imageContainer = document.getElementById("imageContainer");
                 imageContainer.innerHTML = "";
