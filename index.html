@@ -1,46 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Text-to-Image API示例</title>
+    <title>CD Cover Generate API Sample</title>
 </head>
 <body>
-    <h1>Text-to-Image API示例</h1>
+    <h1>CD Cover Generate API Sample</h1>
 
-    <label for="prompt1">Prompt 1：</label>
-    <input type="text" id="prompt1" placeholder="輸入提示1"><br><br>
+    <label for="musicType">Music Type:</label>
+    <input type="text" id="musicType" placeholder="Pop, Hip hop, Rock..."><br><br>
 
-    <label for="prompt2">Prompt 2：</label>
-    <input type="text" id="prompt2" placeholder="輸入提示2"><br><br>
+    <label for="songName">Song Name:</label>
+    <input type="text" id="songName" placeholder="Song Name"><br><br>
 
-    <label for="prompt3">Prompt 3：</label>
-    <input type="text" id="prompt3" placeholder="輸入提示3"><br><br>
+    <label for="lyrics">Lyrics/Descript:</label>
+    <input type="text" id="lyrics" placeholder="Lyric, Descript"><br><br>
+    PS: seperates each sentences by comma...<br><br>
 
-    <button onclick="generateImages()">生成圖片</button><br><br>
+    <button onclick="generateImages()" id="submitButton">Generate CD Cover</button><br><br>
+    <div id="loadingSpinner" style="display: none;">Please Wait...</div><br><br>
 
     <div id="imageContainer">
-        <!-- 這裡將顯示生成的圖片 -->
+        <!-- Here will be the generated CD Cover -->
     </div>
 
     <script>
         async function generateImages() {
-            const prompt1 = document.getElementById('prompt1').value;
-            const prompt2 = document.getElementById('prompt2').value;
-            const prompt3 = document.getElementById('prompt3').value;
+            const musicType = document.getElementById('musicType').value;
+            const albumName = document.getElementById('songName').value;
+            const lyrics = document.getElementById('lyrics').value;
             const imageContainer = document.getElementById('imageContainer');
+            const submitButton = document.getElementById('submitButton');
+            const loadingSpinner = document.getElementById('loadingSpinner');
 
-            // 請將下面的URL替換為你的API端點
+            // disable submit button and show loading spinner
+            submitButton.disabled = true;
+            loadingSpinner.style.display = 'block';
+            
+            // apiURL
             const apiUrl = 'https://zhihmeng.ddns.net/sdapi/v1/txt2img';
 
-
-
-            
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             
             var raw = JSON.stringify({
               "denoising_strength": 0,
-              "prompt": prompt1 + "," + prompt2 + "," + prompt3 + ",a image of cd cover",
-              "negative_prompt": "easy negative",
+              "prompt": musicType + "," + albumName + "," + lyrics + ",an image of CD Cover",
+              "negative_prompt": "bad anatomy, bad hands, missing fingers, extra fingers, three hands, three legs, bad arms, missing legs, missing arms, poorly drawn face, bad face, fused face, cloned face, three crus, fused feet, fused thigh, extra crus, ugly fingers, horn, cartoon, cg, 3d, unreal, animate, amputation, disconnected limbs, nsfw, nude, censored",
               "seed": -1,
               "batch_size": 1,
               "n_iter": 1,
@@ -54,16 +59,7 @@
               "override_settings": {
               "sd_model_checkpoint" :"v1-5-pruned-emaonly.safetensors [6ce0161689]"
               },
-              "script_args": [
-                  0,
-                  true,
-                  true,
-                  "LoRA",
-                  "dingzhenlora_v1(fa7c1732cc95)",
-                  1,
-                  1
-              ],
-              "sampler_index": "Euler"
+              "sampler_index": "Euler a"
             });
             
             var requestOptions = {
@@ -73,11 +69,6 @@
               redirect: 'follow'
             };
 
-            // fetch(apiUrl, requestOptions)
-            //   .then(response => response.text())
-            //   .then(result => console.log(result))
-            //   .catch(error => console.log('error', error));
-
             try {
                 const response = await fetch(apiUrl, requestOptions);
 
@@ -85,12 +76,14 @@
 
                 // 顯示生成的Base64圖片
                 imageContainer.innerHTML = `
-                    <img src="data:image/png;base64, ${data.images}" alt="Image 1">
-                    <img src="data:image/png;base64, ${data.images}" alt="Image 2">
-                    <img src="data:image/png;base64, ${data.images}" alt="Image 3">
+                    <img src="data:image/png;base64, ${data.images}" alt="CD Cover 1">
                 `;
             } catch (error) {
-                console.error('發生錯誤:', error);
+                console.error('Error:', error);
+            } finally {
+                // enable submit button and hide loading spinner
+                submitButton.disabled = false;
+                loadingSpinner.style.display = 'none';
             }
         }
     </script>
