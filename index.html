@@ -32,6 +32,9 @@
             const submitButton = document.getElementById('submitButton');
             const loadingSpinner = document.getElementById('loadingSpinner');
 
+            // remove old images
+            imageContainer.innerHTML = '';
+            
             // disable submit button and show loading spinner
             submitButton.disabled = true;
             loadingSpinner.style.display = 'block';
